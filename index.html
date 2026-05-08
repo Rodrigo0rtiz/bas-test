@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BAS AI Flight Service Assistant</title>
+  <title>BAS Internal Flight Service Assistant</title>
   <style>
     * {
       box-sizing: border-box;
@@ -23,7 +23,7 @@
 
     .app {
       width: 100%;
-      max-width: 1050px;
+      max-width: 1100px;
       background: #ffffff;
       border-radius: 18px;
       box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
@@ -44,13 +44,12 @@
     header p {
       color: #d9eaf7;
       line-height: 1.5;
-      max-width: 760px;
+      max-width: 840px;
     }
 
     .main {
       display: grid;
-      grid-template-columns: 1fr 320px;
-      gap: 0;
+      grid-template-columns: 1fr 330px;
     }
 
     .chat-section {
@@ -59,7 +58,7 @@
     }
 
     .chat-box {
-      height: 460px;
+      height: 470px;
       overflow-y: auto;
       border: 1px solid #d9e2ec;
       border-radius: 14px;
@@ -82,7 +81,7 @@
     }
 
     .bubble {
-      max-width: 78%;
+      max-width: 82%;
       padding: 13px 15px;
       border-radius: 14px;
       line-height: 1.45;
@@ -242,9 +241,9 @@
 <body>
   <div class="app">
     <header>
-      <h1>✈️ BAS AI Flight Service Assistant</h1>
+      <h1>✈️ BAS Internal Flight Service Assistant</h1>
       <p>
-        A prototype chatbot for Bellingham Aviation Services that helps customers and pilots get quick answers about common FBO services while flagging urgent or sensitive requests for staff review.
+        An internal prototype for Bellingham Aviation Services front desk staff. This assistant helps workers remember procedures, respond to common aviation service questions, and identify when a request needs human judgment or direct follow-up.
       </p>
     </header>
 
@@ -253,58 +252,64 @@
         <div id="chatBox" class="chat-box">
           <div class="message bot">
             <div class="bubble">
-              Hello! I’m the BAS AI Flight Service Assistant. I can help with common questions about fuel, parking, rental cars, hotels, after-hours arrivals, deicing, catering, and arrival procedures.
+              Hello! I’m the BAS Internal Flight Service Assistant. I am designed for staff use, not direct customer use.
 
-              For urgent, security-sensitive, or operational requests, I will flag the message for BAS staff review.
+              Ask me what to do when a customer asks about fuel, rental cars, after-hours arrivals, hangar space, hotel recommendations, customs, deicing, or student pilot questions. I can provide a staff checklist, a suggested response, and any human-review warnings.
             </div>
           </div>
         </div>
 
         <div class="input-area">
-          <input id="userInput" type="text" placeholder="Ask a question, such as: I need to arrive after-hours tonight..." />
-          <button class="send-btn" onclick="sendMessage()">Send</button>
+          <input id="userInput" type="text" placeholder="Example: A pilot needs after-hours access and hangar space tonight..." />
+          <button class="send-btn" onclick="sendMessage()">Ask Assistant</button>
         </div>
         <button class="clear-btn" onclick="clearChat()">Clear Chat</button>
       </section>
 
       <aside class="side-panel">
-        <h2>Suggested Questions</h2>
+        <h2>Staff Scenarios</h2>
         <div class="quick-buttons">
-          <button onclick="usePrompt('Do you offer fuel service for Jet-A and AvGas?')">Do you offer fuel service?</button>
-          <button onclick="usePrompt('I am arriving after-hours tonight. What should I know?')">What should I know for an after-hours arrival?</button>
-          <button onclick="usePrompt('Can I request hangar space for tonight?')">Can I request hangar space?</button>
-          <button onclick="usePrompt('Can you help schedule a rental car for my arrival?')">Can you help schedule a rental car?</button>
-          <button onclick="usePrompt('Are there nearby hotels you recommend for pilots or crew?')">Are there nearby hotels?</button>
-          <button onclick="usePrompt('Do you offer deicing during winter operations?')">Do you offer deicing?</button>
-          <button onclick="usePrompt('This is urgent. I need to land tonight and I do not have the FBO access code. I tried calling but no answer. I need hangar space if possible and depart at 0600 tomorrow.')">Test urgent after-hours request</button>
+          <button onclick="usePrompt('A customer asks about fuel pricing and Jet-A availability.')">Fuel pricing / Jet-A question</button>
+          <button onclick="usePrompt('A pilot says they are arriving after-hours tonight and tried calling but no one answered.')">Urgent after-hours arrival</button>
+          <button onclick="usePrompt('A customer asks if we can arrange a rental car for their arrival.')">Rental car request</button>
+          <button onclick="usePrompt('A pilot asks for hangar space overnight and is departing at 0600.')">Hangar space request</button>
+          <button onclick="usePrompt('A new student asks what it takes to get a private pilot license and how much it costs.')">Student pilot question</button>
+          <button onclick="usePrompt('A crew asks for nearby hotel recommendations and transportation options.')">Hotel / crew lodging</button>
+          <button onclick="usePrompt('A pilot asks about customs procedures for an international arrival.')">Customs / international arrival</button>
+          <button onclick="usePrompt('A customer asks about deicing during winter weather.')">Deicing question</button>
+        </div>
+
+        <div class="concept-card">
+          <h3>Purpose</h3>
+          <p>This tool is a memory aid and drafting assistant for BAS workers. It helps reduce inconsistent answers and supports newer employees who may not remember every procedure.</p>
         </div>
 
         <div class="concept-card">
           <h3>Human-in-the-loop</h3>
-          <p>The assistant drafts responses, but BAS staff still review urgent or sensitive information before it is sent.</p>
+          <p>The assistant suggests what staff should check and how they might respond, but employees still make the final decision.</p>
         </div>
 
         <div class="concept-card">
           <h3>Safety rules</h3>
           <ul>
-            <li>Do not provide access codes automatically.</li>
-            <li>Flag urgent after-hours messages.</li>
-            <li>Recommend direct staff follow-up when needed.</li>
+            <li>Do not automatically release access codes.</li>
+            <li>Flag urgent or sensitive situations.</li>
+            <li>Confirm prices, availability, and procedures before replying.</li>
           </ul>
         </div>
 
         <div class="concept-card">
           <h3>Course concepts</h3>
-          <span class="tag">AI Factory</span>
-          <span class="tag">Personalization</span>
-          <span class="tag">Prediction–decision gap</span>
+          <span class="tag">Human-in-the-loop</span>
           <span class="tag">AI governance</span>
+          <span class="tag">Prediction–decision gap</span>
+          <span class="tag">Operational efficiency</span>
         </div>
       </aside>
     </div>
 
     <footer>
-      Prototype only — operational details should be verified by BAS staff before being shared with customers.
+      Internal prototype only — all operational details should be verified by BAS staff before being shared with customers.
     </footer>
   </div>
 
@@ -330,7 +335,7 @@
       }
 
       const response = generateResponse(text);
-      setTimeout(() => addMessage(response, 'bot'), 350);
+      setTimeout(() => addMessage(response, 'bot'), 300);
     }
 
     function addMessage(text, sender) {
@@ -356,11 +361,11 @@
 
     function checkForWarning(input) {
       const lower = input.toLowerCase();
-      const urgentWords = ['urgent', 'tonight', 'no answer', 'locked out', 'after-hours', 'after hours', 'access code', 'hangar space', 'departing 0600', '0600', 'emergency'];
+      const urgentWords = ['urgent', 'tonight', 'no answer', 'locked out', 'after-hours', 'after hours', 'access code', 'hangar space', 'departing 0600', '0600', 'emergency', 'customs'];
       const found = urgentWords.some(word => lower.includes(word));
 
       if (found) {
-        return 'Human review required: This request appears urgent or operationally sensitive. BAS staff should review the response before sending and consider calling the customer directly.';
+        return 'Human review required: This request may involve urgency, access, regulatory information, or operational availability. Staff should verify details and consider calling the customer directly before sending a written response.';
       }
       return '';
     }
@@ -369,53 +374,57 @@
       const lower = input.toLowerCase();
 
       if (lower.includes('access code') || lower.includes('locked out')) {
-        return `Thank you for reaching out. Because this involves facility access, BAS staff must verify the request before providing any access information.\n\nIf you are arriving after-hours or need immediate assistance, please contact BAS directly by phone. A staff member may need to call you back to confirm details and provide the correct next steps.\n\nIf the access instructions are posted at the facility entrance, staff should confirm that information before sending a final response.\n\nWould you like me to draft a staff-reviewed response for this situation?`;
+        return `Staff guide: Facility access request\n\nWhat to check:\n• Verify the customer, aircraft, ETA, and reason for access.\n• Do not automatically provide access details in an AI-generated response.\n• If the access information is posted at the entrance, staff may explain where to look only if that is appropriate under current BAS policy.\n• If the customer says they already called and received no answer, consider calling them directly.\n\nSuggested staff response:\nHello,\n\nThank you for reaching out. I apologize that you were not able to reach us by phone. Since this involves after-hours access, I want to make sure we verify the details before providing instructions. I will review your arrival information and follow up directly with the next steps.\n\nBest,\nBellingham Aviation Services`;
       }
 
       if (lower.includes('after-hours') || lower.includes('after hours') || lower.includes('tonight')) {
-        return `For after-hours arrivals, BAS can help customers prepare by confirming arrival time, parking needs, fuel needs, and any special service requests.\n\nGeneral guidance:\n• Confirm your ETA and aircraft tail number with BAS staff.\n• Hangar space must be confirmed in advance and is based on availability.\n• Self-service fuel may be available, but operational details should be verified before arrival.\n• For urgent requests, direct staff follow-up is recommended.\n\nBecause this may involve access or security-sensitive information, a BAS employee should review the response before sending.`;
+        return `Staff guide: After-hours arrival\n\nWhat to check:\n• Customer name and contact number\n• Aircraft tail number and type\n• ETA and departure time\n• Fuel needs\n• Parking or hangar request\n• Whether the situation needs a direct phone call\n\nSuggested staff response:\nHello,\n\nThank you for letting us know about your after-hours arrival. I apologize if you were unable to reach us by phone. We will review your arrival details, parking needs, and any service requests so we can provide the most accurate information.\n\nPlease note that hangar space must be confirmed by BAS staff and depends on availability. For urgent operational needs, direct phone follow-up may be the best next step.\n\nBest,\nBellingham Aviation Services`;
       }
 
       if (lower.includes('fuel') || lower.includes('jet-a') || lower.includes('avgas')) {
-        return `BAS can assist with fuel service requests for aircraft arriving at KBLI. Fuel availability, pricing, and service options should be confirmed directly with BAS because prices and operational conditions can change.\n\nA good response would ask for the aircraft type, tail number, arrival time, and requested fuel quantity so staff can prepare service more efficiently.`;
+        return `Staff guide: Fuel question\n\nWhat to check:\n• Fuel type: Jet-A or AvGas\n• Current fuel pricing\n• Full-service vs. self-service availability\n• Aircraft type and requested quantity\n• Arrival time and whether staff needs to be ready on the ramp\n\nSuggested staff response:\nHello,\n\nThank you for reaching out. We can assist with fuel service at KBLI. To provide the most accurate information, could you please confirm your aircraft type, tail number, arrival time, and requested fuel type or quantity?\n\nFuel pricing and service availability should be confirmed with current BAS operations before finalizing the response.\n\nBest,\nBellingham Aviation Services`;
       }
 
       if (lower.includes('rental car') || lower.includes('car')) {
-        return `BAS can help coordinate rental car requests for arriving customers when details are provided in advance.\n\nTo complete the request, staff would typically need the customer name, arrival date and time, phone number, driver information, and any rental preferences.\n\nThis is a good example of where AI can draft the email, but a staff member still confirms availability before sending.`;
+        return `Staff guide: Rental car request\n\nWhat to check:\n• Customer name and phone number\n• Arrival date and time\n• Driver information, if required\n• Vehicle preference\n• Rental company availability\n• Whether the car should be staged for arrival\n\nSuggested staff response:\nHello,\n\nThank you for contacting Bellingham Aviation Services. We can help coordinate a rental car for your arrival. Please send your arrival date and time, phone number, driver information, and any vehicle preference so we can begin the request.\n\nOnce availability is confirmed, we will follow up with the next steps.\n\nBest,\nBellingham Aviation Services`;
+      }
+
+      if (lower.includes('private pilot') || lower.includes('student') || lower.includes('flight training') || lower.includes('license')) {
+        return `Staff guide: New student / private pilot license question\n\nWhat to check:\n• Is the person brand new or do they already have flight hours?\n• Are they asking about costs, timeline, requirements, or scheduling?\n• Should they be directed to flight school staff for exact pricing and next steps?\n\nSuggested staff response:\nHello,\n\nThank you for your interest in flight training. The path to earning a private pilot license can vary depending on your schedule, prior experience, and how often you train. If you already have flight hours, that may change the estimate and next steps.\n\nWe would be happy to connect you with the appropriate flight school contact so they can provide the most accurate information about training requirements, costs, and scheduling.\n\nBest,\nBellingham Aviation Services`;
       }
 
       if (lower.includes('hotel') || lower.includes('lodging')) {
-        return `For hotel recommendations, BAS staff can provide general nearby lodging options based on customer needs, arrival time, and transportation plans.\n\nThe assistant can draft a helpful response, but staff should verify current availability, rates, and shuttle options before making any specific recommendation.`;
+        return `Staff guide: Hotel or crew lodging question\n\nWhat to check:\n• Number of guests\n• Arrival and departure dates\n• Transportation needs\n• Preferred hotel type or budget\n• Current hotel availability if BAS is making a recommendation\n\nSuggested staff response:\nHello,\n\nThank you for reaching out. We can provide general nearby hotel options and help point you toward transportation resources for your stay. To make the best recommendation, could you please confirm your arrival date, departure date, number of guests, and whether you will need transportation from the airport?\n\nBest,\nBellingham Aviation Services`;
       }
 
       if (lower.includes('hangar')) {
-        return `Hangar space may be available depending on aircraft size, timing, and current ramp or hangar capacity.\n\nA BAS staff member should confirm the aircraft tail number, wingspan, arrival time, departure time, and whether the request is overnight or temporary.\n\nBecause hangar availability can change quickly, this should be reviewed by staff before promising space to the customer.`;
+        return `Staff guide: Hangar space request\n\nWhat to check:\n• Tail number\n• Aircraft type and size\n• Arrival and departure time\n• Overnight vs. short-term request\n• Current hangar availability\n\nSuggested staff response:\nHello,\n\nThank you for your hangar request. Hangar space depends on aircraft size, timing, and current availability. Could you please confirm your tail number, aircraft type, arrival time, and planned departure time?\n\nOnce BAS staff reviews availability, we can confirm whether hangar space is possible or provide ramp parking options.\n\nBest,\nBellingham Aviation Services`;
       }
 
       if (lower.includes('customs') || lower.includes('international')) {
-        return `For customs or international arrival questions, BAS can provide general guidance, but the customer should confirm official requirements with the appropriate customs authority.\n\nStaff should avoid giving final regulatory instructions unless they have verified the current procedure. This is a good example of a human-in-the-loop situation.`;
+        return `Staff guide: Customs or international arrival\n\nWhat to check:\n• Do not give final regulatory guidance without verification.\n• Confirm whether the customer has contacted the appropriate customs office.\n• Verify arrival time, aircraft information, and any BAS support needed.\n• Staff should review current customs procedures before replying.\n\nSuggested staff response:\nHello,\n\nThank you for reaching out about your international arrival. BAS can help with general arrival support, but official customs requirements should be confirmed with the appropriate customs authority.\n\nPlease send your planned arrival time, aircraft tail number, and any services you need from BAS, and we will review what support we can provide.\n\nBest,\nBellingham Aviation Services`;
       }
 
       if (lower.includes('catering') || lower.includes('food')) {
-        return `BAS can help coordinate catering requests when customers provide enough notice.\n\nA useful response would ask for arrival time, number of passengers, dietary restrictions, preferred items, and whether the order is for crew, passengers, or both.`;
+        return `Staff guide: Catering request\n\nWhat to check:\n• Date and time needed\n• Number of people\n• Dietary restrictions\n• Type of food or beverage requested\n• Vendor availability and required notice\n\nSuggested staff response:\nHello,\n\nThank you for your catering request. Could you please confirm your arrival time, number of passengers or crew, preferred items, and any dietary restrictions?\n\nOnce we have those details, BAS staff can review availability and coordinate the request.\n\nBest,\nBellingham Aviation Services`;
       }
 
       if (lower.includes('deicing') || lower.includes('ice') || lower.includes('winter')) {
-        return `Deicing requests depend on weather, staffing, equipment, and aircraft needs.\n\nThe assistant can help draft the response, but BAS staff should confirm availability, timing, and operational limitations before giving the customer a final answer.`;
+        return `Staff guide: Deicing question\n\nWhat to check:\n• Weather conditions\n• Aircraft type\n• Staff and equipment availability\n• Timing of departure\n• Whether the customer needs an estimate or confirmation\n\nSuggested staff response:\nHello,\n\nThank you for checking in about deicing. Deicing availability depends on weather, staffing, equipment, aircraft type, and timing. Could you please confirm your aircraft type, tail number, and planned departure time?\n\nBAS staff will review conditions and availability before confirming service.\n\nBest,\nBellingham Aviation Services`;
       }
 
       if (lower.includes('parking') || lower.includes('tie-down') || lower.includes('tiedown')) {
-        return `Aircraft parking or tie-down availability depends on aircraft size, arrival time, and current ramp conditions.\n\nStaff should confirm the tail number, aircraft type, ETA, and expected departure time before giving a final answer.`;
+        return `Staff guide: Parking / tie-down request\n\nWhat to check:\n• Aircraft type and tail number\n• ETA and departure time\n• Overnight or short-term parking\n• Ramp capacity and weather concerns\n\nSuggested staff response:\nHello,\n\nThank you for contacting BAS. Aircraft parking depends on aircraft size, timing, and ramp availability. Could you please confirm your aircraft type, tail number, ETA, and planned departure time?\n\nOnce reviewed, BAS staff can confirm parking or tie-down options.\n\nBest,\nBellingham Aviation Services`;
       }
 
-      return `Thanks for your question. I can help draft a professional BAS response, but some operational details should be reviewed by staff before sending.\n\nTo provide the best response, please include the customer name, aircraft tail number if available, arrival or departure time, requested service, and any special notes.`;
+      return `Staff guide: General customer question\n\nWhat to check:\n• What service is the customer asking about?\n• Is the request urgent or after-hours?\n• Does it involve pricing, access, safety, or availability?\n• Should staff call the customer instead of only emailing?\n\nSuggested staff response:\nHello,\n\nThank you for reaching out to Bellingham Aviation Services. To make sure we provide the most accurate information, could you please share a few more details about your request, including your arrival time, aircraft information if applicable, and the service you need?\n\nBest,\nBellingham Aviation Services`;
     }
 
     function clearChat() {
       chatBox.innerHTML = `
         <div class="message bot">
           <div class="bubble">
-            Hello! I’m the BAS AI Flight Service Assistant. I can help with common questions about fuel, parking, rental cars, hotels, after-hours arrivals, deicing, catering, and arrival procedures.\n\nFor urgent, security-sensitive, or operational requests, I will flag the message for BAS staff review.
+            Hello! I’m the BAS Internal Flight Service Assistant. I am designed for staff use, not direct customer use.\n\nAsk me what to do when a customer asks about fuel, rental cars, after-hours arrivals, hangar space, hotel recommendations, customs, deicing, or student pilot questions. I can provide a staff checklist, a suggested response, and any human-review warnings.
           </div>
         </div>
       `;
