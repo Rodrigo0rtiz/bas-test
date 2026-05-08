@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BAS AI Flight Service Assistant</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      background: #f3f6f9;
+      color: #1f2933;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 30px 16px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 1050px;
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+      overflow: hidden;
+    }
+
+    header {
+      background: linear-gradient(135deg, #102a43, #1d4e89);
+      color: white;
+      padding: 28px;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      color: #d9eaf7;
+      line-height: 1.5;
+      max-width: 760px;
+    }
+
+    .main {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 0;
+    }
+
+    .chat-section {
+      padding: 24px;
+      border-right: 1px solid #e5e7eb;
+    }
+
+    .chat-box {
+      height: 460px;
+      overflow-y: auto;
+      border: 1px solid #d9e2ec;
+      border-radius: 14px;
+      padding: 18px;
+      background: #f8fafc;
+      margin-bottom: 18px;
+    }
+
+    .message {
+      margin-bottom: 16px;
+      display: flex;
+    }
+
+    .message.bot {
+      justify-content: flex-start;
+    }
+
+    .message.user {
+      justify-content: flex-end;
+    }
+
+    .bubble {
+      max-width: 78%;
+      padding: 13px 15px;
+      border-radius: 14px;
+      line-height: 1.45;
+      font-size: 0.95rem;
+      white-space: pre-line;
+    }
+
+    .bot .bubble {
+      background: #ffffff;
+      border: 1px solid #d9e2ec;
+      color: #243b53;
+    }
+
+    .user .bubble {
+      background: #1d4e89;
+      color: white;
+    }
+
+    .warning {
+      background: #fff4e5;
+      border-left: 5px solid #f59e0b;
+      color: #7c2d12;
+      padding: 12px 14px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+
+    .input-area {
+      display: flex;
+      gap: 10px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 14px;
+      border: 1px solid #bcccdc;
+      border-radius: 12px;
+      font-size: 1rem;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 600;
+      transition: 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      opacity: 0.92;
+    }
+
+    .send-btn {
+      background: #1d4e89;
+      color: white;
+    }
+
+    .clear-btn {
+      background: #e5e7eb;
+      color: #334e68;
+      margin-top: 10px;
+      width: 100%;
+    }
+
+    .side-panel {
+      padding: 24px;
+      background: #f8fafc;
+    }
+
+    .side-panel h2 {
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+      color: #102a43;
+    }
+
+    .quick-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .quick-buttons button {
+      background: white;
+      color: #1d4e89;
+      border: 1px solid #bcccdc;
+      text-align: left;
+      line-height: 1.35;
+    }
+
+    .concept-card {
+      background: white;
+      border: 1px solid #d9e2ec;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .concept-card h3 {
+      font-size: 1rem;
+      color: #102a43;
+      margin-bottom: 8px;
+    }
+
+    .concept-card p,
+    .concept-card li {
+      font-size: 0.9rem;
+      color: #52606d;
+      line-height: 1.45;
+    }
+
+    .concept-card ul {
+      padding-left: 18px;
+      margin-top: 8px;
+    }
+
+    .tag {
+      display: inline-block;
+      background: #d9eaf7;
+      color: #1d4e89;
+      padding: 5px 8px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      margin: 4px 4px 0 0;
+      font-weight: 600;
+    }
+
+    footer {
+      padding: 16px 24px;
+      background: #102a43;
+      color: #d9eaf7;
+      font-size: 0.85rem;
+      text-align: center;
+    }
+
+    @media (max-width: 850px) {
+      .main {
+        grid-template-columns: 1fr;
+      }
+
+      .chat-section {
+        border-right: none;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .chat-box {
+        height: 420px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>✈️ BAS AI Flight Service Assistant</h1>
+      <p>
+        A prototype chatbot for Bellingham Aviation Services that helps customers and pilots get quick answers about common FBO services while flagging urgent or sensitive requests for staff review.
+      </p>
+    </header>
+
+    <div class="main">
+      <section class="chat-section">
+        <div id="chatBox" class="chat-box">
+          <div class="message bot">
+            <div class="bubble">
+              Hello! I’m the BAS AI Flight Service Assistant. I can help with common questions about fuel, parking, rental cars, hotels, after-hours arrivals, deicing, catering, and arrival procedures.
+
+              For urgent, security-sensitive, or operational requests, I will flag the message for BAS staff review.
+            </div>
+          </div>
+        </div>
+
+        <div class="input-area">
+          <input id="userInput" type="text" placeholder="Ask a question, such as: I need to arrive after-hours tonight..." />
+          <button class="send-btn" onclick="sendMessage()">Send</button>
+        </div>
+        <button class="clear-btn" onclick="clearChat()">Clear Chat</button>
+      </section>
+
+      <aside class="side-panel">
+        <h2>Suggested Questions</h2>
+        <div class="quick-buttons">
+          <button onclick="usePrompt('Do you offer fuel service for Jet-A and AvGas?')">Do you offer fuel service?</button>
+          <button onclick="usePrompt('I am arriving after-hours tonight. What should I know?')">What should I know for an after-hours arrival?</button>
+          <button onclick="usePrompt('Can I request hangar space for tonight?')">Can I request hangar space?</button>
+          <button onclick="usePrompt('Can you help schedule a rental car for my arrival?')">Can you help schedule a rental car?</button>
+          <button onclick="usePrompt('Are there nearby hotels you recommend for pilots or crew?')">Are there nearby hotels?</button>
+          <button onclick="usePrompt('Do you offer deicing during winter operations?')">Do you offer deicing?</button>
+          <button onclick="usePrompt('This is urgent. I need to land tonight and I do not have the FBO access code. I tried calling but no answer. I need hangar space if possible and depart at 0600 tomorrow.')">Test urgent after-hours request</button>
+        </div>
+
+        <div class="concept-card">
+          <h3>Human-in-the-loop</h3>
+          <p>The assistant drafts responses, but BAS staff still review urgent or sensitive information before it is sent.</p>
+        </div>
+
+        <div class="concept-card">
+          <h3>Safety rules</h3>
+          <ul>
+            <li>Do not provide access codes automatically.</li>
+            <li>Flag urgent after-hours messages.</li>
+            <li>Recommend direct staff follow-up when needed.</li>
+          </ul>
+        </div>
+
+        <div class="concept-card">
+          <h3>Course concepts</h3>
+          <span class="tag">AI Factory</span>
+          <span class="tag">Personalization</span>
+          <span class="tag">Prediction–decision gap</span>
+          <span class="tag">AI governance</span>
+        </div>
+      </aside>
+    </div>
+
+    <footer>
+      Prototype only — operational details should be verified by BAS staff before being shared with customers.
+    </footer>
+  </div>
+
+  <script>
+    const chatBox = document.getElementById('chatBox');
+    const userInput = document.getElementById('userInput');
+
+    function usePrompt(text) {
+      userInput.value = text;
+      sendMessage();
+    }
+
+    function sendMessage() {
+      const text = userInput.value.trim();
+      if (!text) return;
+
+      addMessage(text, 'user');
+      userInput.value = '';
+
+      const warning = checkForWarning(text);
+      if (warning) {
+        addWarning(warning);
+      }
+
+      const response = generateResponse(text);
+      setTimeout(() => addMessage(response, 'bot'), 350);
+    }
+
+    function addMessage(text, sender) {
+      const message = document.createElement('div');
+      message.className = `message ${sender}`;
+
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.textContent = text;
+
+      message.appendChild(bubble);
+      chatBox.appendChild(message);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function addWarning(text) {
+      const warning = document.createElement('div');
+      warning.className = 'warning';
+      warning.textContent = text;
+      chatBox.appendChild(warning);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function checkForWarning(input) {
+      const lower = input.toLowerCase();
+      const urgentWords = ['urgent', 'tonight', 'no answer', 'locked out', 'after-hours', 'after hours', 'access code', 'hangar space', 'departing 0600', '0600', 'emergency'];
+      const found = urgentWords.some(word => lower.includes(word));
+
+      if (found) {
+        return 'Human review required: This request appears urgent or operationally sensitive. BAS staff should review the response before sending and consider calling the customer directly.';
+      }
+      return '';
+    }
+
+    function generateResponse(input) {
+      const lower = input.toLowerCase();
+
+      if (lower.includes('access code') || lower.includes('locked out')) {
+        return `Thank you for reaching out. Because this involves facility access, BAS staff must verify the request before providing any access information.\n\nIf you are arriving after-hours or need immediate assistance, please contact BAS directly by phone. A staff member may need to call you back to confirm details and provide the correct next steps.\n\nIf the access instructions are posted at the facility entrance, staff should confirm that information before sending a final response.\n\nWould you like me to draft a staff-reviewed response for this situation?`;
+      }
+
+      if (lower.includes('after-hours') || lower.includes('after hours') || lower.includes('tonight')) {
+        return `For after-hours arrivals, BAS can help customers prepare by confirming arrival time, parking needs, fuel needs, and any special service requests.\n\nGeneral guidance:\n• Confirm your ETA and aircraft tail number with BAS staff.\n• Hangar space must be confirmed in advance and is based on availability.\n• Self-service fuel may be available, but operational details should be verified before arrival.\n• For urgent requests, direct staff follow-up is recommended.\n\nBecause this may involve access or security-sensitive information, a BAS employee should review the response before sending.`;
+      }
+
+      if (lower.includes('fuel') || lower.includes('jet-a') || lower.includes('avgas')) {
+        return `BAS can assist with fuel service requests for aircraft arriving at KBLI. Fuel availability, pricing, and service options should be confirmed directly with BAS because prices and operational conditions can change.\n\nA good response would ask for the aircraft type, tail number, arrival time, and requested fuel quantity so staff can prepare service more efficiently.`;
+      }
+
+      if (lower.includes('rental car') || lower.includes('car')) {
+        return `BAS can help coordinate rental car requests for arriving customers when details are provided in advance.\n\nTo complete the request, staff would typically need the customer name, arrival date and time, phone number, driver information, and any rental preferences.\n\nThis is a good example of where AI can draft the email, but a staff member still confirms availability before sending.`;
+      }
+
+      if (lower.includes('hotel') || lower.includes('lodging')) {
+        return `For hotel recommendations, BAS staff can provide general nearby lodging options based on customer needs, arrival time, and transportation plans.\n\nThe assistant can draft a helpful response, but staff should verify current availability, rates, and shuttle options before making any specific recommendation.`;
+      }
+
+      if (lower.includes('hangar')) {
+        return `Hangar space may be available depending on aircraft size, timing, and current ramp or hangar capacity.\n\nA BAS staff member should confirm the aircraft tail number, wingspan, arrival time, departure time, and whether the request is overnight or temporary.\n\nBecause hangar availability can change quickly, this should be reviewed by staff before promising space to the customer.`;
+      }
+
+      if (lower.includes('customs') || lower.includes('international')) {
+        return `For customs or international arrival questions, BAS can provide general guidance, but the customer should confirm official requirements with the appropriate customs authority.\n\nStaff should avoid giving final regulatory instructions unless they have verified the current procedure. This is a good example of a human-in-the-loop situation.`;
+      }
+
+      if (lower.includes('catering') || lower.includes('food')) {
+        return `BAS can help coordinate catering requests when customers provide enough notice.\n\nA useful response would ask for arrival time, number of passengers, dietary restrictions, preferred items, and whether the order is for crew, passengers, or both.`;
+      }
+
+      if (lower.includes('deicing') || lower.includes('ice') || lower.includes('winter')) {
+        return `Deicing requests depend on weather, staffing, equipment, and aircraft needs.\n\nThe assistant can help draft the response, but BAS staff should confirm availability, timing, and operational limitations before giving the customer a final answer.`;
+      }
+
+      if (lower.includes('parking') || lower.includes('tie-down') || lower.includes('tiedown')) {
+        return `Aircraft parking or tie-down availability depends on aircraft size, arrival time, and current ramp conditions.\n\nStaff should confirm the tail number, aircraft type, ETA, and expected departure time before giving a final answer.`;
+      }
+
+      return `Thanks for your question. I can help draft a professional BAS response, but some operational details should be reviewed by staff before sending.\n\nTo provide the best response, please include the customer name, aircraft tail number if available, arrival or departure time, requested service, and any special notes.`;
+    }
+
+    function clearChat() {
+      chatBox.innerHTML = `
+        <div class="message bot">
+          <div class="bubble">
+            Hello! I’m the BAS AI Flight Service Assistant. I can help with common questions about fuel, parking, rental cars, hotels, after-hours arrivals, deicing, catering, and arrival procedures.\n\nFor urgent, security-sensitive, or operational requests, I will flag the message for BAS staff review.
+          </div>
+        </div>
+      `;
+    }
+
+    userInput.addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+        sendMessage();
+      }
+    });
+  </script>
+</body>
+</html>
