@@ -1,440 +1,1211 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BAS Internal Flight Service Assistant</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, Helvetica, sans-serif;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BAS AI Email Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0B1F3A;
+    --navy-mid: #122744;
+    --navy-light: #1A3560;
+    --sky: #4A9EE0;
+    --sky-light: #7DC0F5;
+    --horizon: #B8D8F0;
+    --gold: #E8A020;
+    --gold-light: #F5C050;
+    --white: #F4F8FD;
+    --white-pure: #FFFFFF;
+    --muted: #8BA4BF;
+    --border: rgba(74, 158, 224, 0.2);
+    --border-strong: rgba(74, 158, 224, 0.4);
+    --card-bg: rgba(255,255,255,0.04);
+    --success: #2EC887;
+    --font-display: 'Syne', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
 
-    body {
-      background: #f3f6f9;
-      color: #1f2933;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      padding: 30px 16px;
-    }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    .app {
-      width: 100%;
-      max-width: 1100px;
-      background: #ffffff;
-      border-radius: 18px;
-      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
-      overflow: hidden;
-    }
+  body {
+    background: var(--navy);
+    color: var(--white);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(74,158,224,0.12) 0%, transparent 60%),
+      linear-gradient(180deg, #0B1F3A 0%, #081628 100%);
+  }
 
-    header {
-      background: linear-gradient(135deg, #102a43, #1d4e89);
-      color: white;
-      padding: 28px;
-    }
+  /* ── HEADER ── */
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    background: rgba(11,31,58,0.92);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+  }
 
-    header h1 {
-      font-size: 2rem;
-      margin-bottom: 8px;
-    }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
 
-    header p {
-      color: #d9eaf7;
-      line-height: 1.5;
-      max-width: 840px;
-    }
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--sky), var(--sky-light));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 0 20px rgba(74,158,224,0.3);
+  }
 
+  .logo-text {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    color: var(--white-pure);
+  }
+
+  .logo-sub {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 400;
+  }
+
+  .header-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(46,200,135,0.12);
+    border: 1px solid rgba(46,200,135,0.3);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 11px;
+    color: var(--success);
+    font-family: var(--font-mono);
+    letter-spacing: 0.05em;
+  }
+
+  .pulse-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--success);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  /* ── MAIN LAYOUT ── */
+  .main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem 4rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .page-title {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--white-pure);
+    margin-bottom: 4px;
+  }
+
+  .page-subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 300;
+    letter-spacing: 0.02em;
+  }
+
+  .title-row {
+    grid-column: 1 / -1;
+    margin-bottom: 0.5rem;
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.75rem;
+    backdrop-filter: blur(8px);
+  }
+
+  .card-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--sky);
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-label::before {
+    content: '';
+    display: block;
+    width: 16px;
+    height: 1px;
+    background: var(--sky);
+    opacity: 0.6;
+  }
+
+  /* ── FORM ── */
+  .form-row {
+    margin-bottom: 1.25rem;
+  }
+
+  label {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  input[type="text"],
+  input[type="datetime-local"],
+  select,
+  textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: var(--white-pure);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 300;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  input[type="text"]:focus,
+  input[type="datetime-local"]:focus,
+  select:focus,
+  textarea:focus {
+    border-color: var(--sky);
+    background: rgba(74,158,224,0.08);
+  }
+
+  input::placeholder, textarea::placeholder {
+    color: rgba(139,164,191,0.5);
+  }
+
+  select option {
+    background: var(--navy-mid);
+    color: var(--white-pure);
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 90px;
+    line-height: 1.6;
+  }
+
+  .form-row-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  /* ── TOGGLES ── */
+  .toggle-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .toggle-item {
+    flex: 1;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.2s;
+    user-select: none;
+  }
+
+  .toggle-item:hover {
+    border-color: var(--border-strong);
+    background: rgba(74,158,224,0.06);
+  }
+
+  .toggle-item.active {
+    border-color: var(--sky);
+    background: rgba(74,158,224,0.12);
+  }
+
+  .toggle-check {
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .toggle-item.active .toggle-check {
+    background: var(--sky);
+    border-color: var(--sky);
+  }
+
+  .toggle-label {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--white);
+  }
+
+  .toggle-item.active .toggle-label {
+    color: var(--sky-light);
+  }
+
+  /* ── GENERATE BUTTON ── */
+  .btn-generate {
+    width: 100%;
+    background: linear-gradient(135deg, var(--sky), #2278C0);
+    border: none;
+    border-radius: 10px;
+    padding: 14px 24px;
+    color: var(--white-pure);
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: all 0.25s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 4px 24px rgba(74,158,224,0.25);
+    margin-top: 0.25rem;
+  }
+
+  .btn-generate:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 32px rgba(74,158,224,0.4);
+  }
+
+  .btn-generate:active {
+    transform: translateY(0);
+  }
+
+  .btn-generate.loading {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  /* ── OUTPUT PANEL ── */
+  .output-panel {
+    position: sticky;
+    top: 84px;
+  }
+
+  .output-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3.5rem 2rem;
+    text-align: center;
+    gap: 1rem;
+    min-height: 300px;
+  }
+
+  .empty-icon {
+    width: 56px;
+    height: 56px;
+    background: rgba(74,158,224,0.1);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    margin-bottom: 0.5rem;
+  }
+
+  .empty-title {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--white-pure);
+  }
+
+  .empty-sub {
+    font-size: 12px;
+    color: var(--muted);
+    max-width: 200px;
+    line-height: 1.6;
+  }
+
+  /* ── EMAIL OUTPUT ── */
+  .email-output {
+    display: none;
+  }
+
+  .email-subject {
+    background: rgba(232,160,32,0.1);
+    border: 1px solid rgba(232,160,32,0.3);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .subject-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold);
+    white-space: nowrap;
+  }
+
+  .subject-text {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--white-pure);
+  }
+
+  .email-body {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    font-size: 13.5px;
+    line-height: 1.8;
+    color: var(--white);
+    white-space: pre-wrap;
+    font-weight: 300;
+    margin-bottom: 1.25rem;
+    min-height: 200px;
+    font-family: var(--font-body);
+  }
+
+  .email-actions {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .btn-action {
+    flex: 1;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid;
+    font-family: var(--font-body);
+  }
+
+  .btn-copy {
+    background: rgba(74,158,224,0.1);
+    border-color: var(--border-strong);
+    color: var(--sky-light);
+  }
+
+  .btn-copy:hover {
+    background: rgba(74,158,224,0.2);
+  }
+
+  .btn-copy.copied {
+    background: rgba(46,200,135,0.1);
+    border-color: rgba(46,200,135,0.4);
+    color: var(--success);
+  }
+
+  .btn-clear {
+    background: transparent;
+    border-color: var(--border);
+    color: var(--muted);
+  }
+
+  .btn-clear:hover {
+    background: rgba(255,255,255,0.05);
+    color: var(--white);
+  }
+
+  /* ── LOADING ANIMATION ── */
+  .generating-overlay {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    gap: 1rem;
+    min-height: 300px;
+  }
+
+  .radar {
+    width: 64px;
+    height: 64px;
+    position: relative;
+  }
+
+  .radar-ring {
+    position: absolute;
+    inset: 0;
+    border: 2px solid var(--sky);
+    border-radius: 50%;
+    opacity: 0.3;
+  }
+
+  .radar-sweep {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, transparent 70%, rgba(74,158,224,0.5) 100%);
+    animation: spin 1.5s linear infinite;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .generating-text {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--sky);
+    letter-spacing: 0.08em;
+    animation: blink 1.2s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* ── WARNING BANNER ── */
+  .warning-banner {
+    display: none;
+    background: rgba(232,160,32,0.08);
+    border: 1px solid rgba(232,160,32,0.35);
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 1.25rem;
+  }
+
+  .warning-banner.error {
+    background: rgba(226,75,74,0.08);
+    border-color: rgba(226,75,74,0.35);
+  }
+
+  .warning-title {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .warning-banner.error .warning-title {
+    color: #E24B4A;
+  }
+
+  .warning-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .warning-list li {
+    font-size: 12px;
+    color: var(--white);
+    font-weight: 300;
+    padding-left: 14px;
+    position: relative;
+    line-height: 1.5;
+  }
+
+  .warning-list li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--gold);
+  }
+
+  .warning-banner.error .warning-list li::before {
+    color: #E24B4A;
+  }
+
+  .warning-proceed {
+    margin-top: 10px;
+    font-size: 11px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  /* ── FOOTER ── */
+  .footer-note {
+    grid-column: 1 / -1;
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    opacity: 0.6;
+    margin-top: 1rem;
+    font-family: var(--font-mono);
+    letter-spacing: 0.04em;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
     .main {
-      display: grid;
-      grid-template-columns: 1fr 330px;
+      grid-template-columns: 1fr;
+      padding: 1.5rem 1rem;
     }
-
-    .chat-section {
-      padding: 24px;
-      border-right: 1px solid #e5e7eb;
-    }
-
-    .chat-box {
-      height: 470px;
-      overflow-y: auto;
-      border: 1px solid #d9e2ec;
-      border-radius: 14px;
-      padding: 18px;
-      background: #f8fafc;
-      margin-bottom: 18px;
-    }
-
-    .message {
-      margin-bottom: 16px;
-      display: flex;
-    }
-
-    .message.bot {
-      justify-content: flex-start;
-    }
-
-    .message.user {
-      justify-content: flex-end;
-    }
-
-    .bubble {
-      max-width: 82%;
-      padding: 13px 15px;
-      border-radius: 14px;
-      line-height: 1.45;
-      font-size: 0.95rem;
-      white-space: pre-line;
-    }
-
-    .bot .bubble {
-      background: #ffffff;
-      border: 1px solid #d9e2ec;
-      color: #243b53;
-    }
-
-    .user .bubble {
-      background: #1d4e89;
-      color: white;
-    }
-
-    .warning {
-      background: #fff4e5;
-      border-left: 5px solid #f59e0b;
-      color: #7c2d12;
-      padding: 12px 14px;
-      border-radius: 10px;
-      margin-bottom: 16px;
-      font-size: 0.92rem;
-      line-height: 1.45;
-    }
-
-    .input-area {
-      display: flex;
-      gap: 10px;
-    }
-
-    input[type="text"] {
-      flex: 1;
-      padding: 14px;
-      border: 1px solid #bcccdc;
-      border-radius: 12px;
-      font-size: 1rem;
-    }
-
-    button {
-      border: none;
-      border-radius: 12px;
-      padding: 12px 16px;
-      cursor: pointer;
-      font-size: 0.95rem;
-      font-weight: 600;
-      transition: 0.2s ease;
-    }
-
-    button:hover {
-      transform: translateY(-1px);
-      opacity: 0.92;
-    }
-
-    .send-btn {
-      background: #1d4e89;
-      color: white;
-    }
-
-    .clear-btn {
-      background: #e5e7eb;
-      color: #334e68;
-      margin-top: 10px;
-      width: 100%;
-    }
-
-    .side-panel {
-      padding: 24px;
-      background: #f8fafc;
-    }
-
-    .side-panel h2 {
-      font-size: 1.1rem;
-      margin-bottom: 12px;
-      color: #102a43;
-    }
-
-    .quick-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 24px;
-    }
-
-    .quick-buttons button {
-      background: white;
-      color: #1d4e89;
-      border: 1px solid #bcccdc;
-      text-align: left;
-      line-height: 1.35;
-    }
-
-    .concept-card {
-      background: white;
-      border: 1px solid #d9e2ec;
-      border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 16px;
-    }
-
-    .concept-card h3 {
-      font-size: 1rem;
-      color: #102a43;
-      margin-bottom: 8px;
-    }
-
-    .concept-card p,
-    .concept-card li {
-      font-size: 0.9rem;
-      color: #52606d;
-      line-height: 1.45;
-    }
-
-    .concept-card ul {
-      padding-left: 18px;
-      margin-top: 8px;
-    }
-
-    .tag {
-      display: inline-block;
-      background: #d9eaf7;
-      color: #1d4e89;
-      padding: 5px 8px;
-      border-radius: 999px;
-      font-size: 0.75rem;
-      margin: 4px 4px 0 0;
-      font-weight: 600;
-    }
-
-    footer {
-      padding: 16px 24px;
-      background: #102a43;
-      color: #d9eaf7;
-      font-size: 0.85rem;
-      text-align: center;
-    }
-
-    @media (max-width: 850px) {
-      .main {
-        grid-template-columns: 1fr;
-      }
-
-      .chat-section {
-        border-right: none;
-        border-bottom: 1px solid #e5e7eb;
-      }
-
-      .chat-box {
-        height: 420px;
-      }
-    }
-  </style>
+    .output-panel { position: static; }
+    .form-row-split { grid-template-columns: 1fr; }
+  }
+</style>
 </head>
 <body>
-  <div class="app">
-    <header>
-      <h1>✈️ BAS Internal Flight Service Assistant</h1>
-      <p>
-        An internal prototype for Bellingham Aviation Services front desk staff. This assistant helps workers remember procedures, respond to common aviation service questions, and identify when a request needs human judgment or direct follow-up.
-      </p>
-    </header>
 
-    <div class="main">
-      <section class="chat-section">
-        <div id="chatBox" class="chat-box">
-          <div class="message bot">
-            <div class="bubble">
-              Hello! I’m the BAS Internal Flight Service Assistant. I am designed for staff use, not direct customer use.
-
-              Ask me what to do when a customer asks about fuel, rental cars, after-hours arrivals, hangar space, hotel recommendations, customs, deicing, or student pilot questions. I can provide a staff checklist, a suggested response, and any human-review warnings.
-            </div>
-          </div>
-        </div>
-
-        <div class="input-area">
-          <input id="userInput" type="text" placeholder="Example: A pilot needs after-hours access and hangar space tonight..." />
-          <button class="send-btn" onclick="sendMessage()">Ask Assistant</button>
-        </div>
-        <button class="clear-btn" onclick="clearChat()">Clear Chat</button>
-      </section>
-
-      <aside class="side-panel">
-        <h2>Staff Scenarios</h2>
-        <div class="quick-buttons">
-          <button onclick="usePrompt('A customer asks about fuel pricing and Jet-A availability.')">Fuel pricing / Jet-A question</button>
-          <button onclick="usePrompt('A pilot says they are arriving after-hours tonight and tried calling but no one answered.')">Urgent after-hours arrival</button>
-          <button onclick="usePrompt('A customer asks if we can arrange a rental car for their arrival.')">Rental car request</button>
-          <button onclick="usePrompt('A pilot asks for hangar space overnight and is departing at 0600.')">Hangar space request</button>
-          <button onclick="usePrompt('A new student asks what it takes to get a private pilot license and how much it costs.')">Student pilot question</button>
-          <button onclick="usePrompt('A crew asks for nearby hotel recommendations and transportation options.')">Hotel / crew lodging</button>
-          <button onclick="usePrompt('A pilot asks about customs procedures for an international arrival.')">Customs / international arrival</button>
-          <button onclick="usePrompt('A customer asks about deicing during winter weather.')">Deicing question</button>
-        </div>
-
-        <div class="concept-card">
-          <h3>Purpose</h3>
-          <p>This tool is a memory aid and drafting assistant for BAS workers. It helps reduce inconsistent answers and supports newer employees who may not remember every procedure.</p>
-        </div>
-
-        <div class="concept-card">
-          <h3>Human-in-the-loop</h3>
-          <p>The assistant suggests what staff should check and how they might respond, but employees still make the final decision.</p>
-        </div>
-
-        <div class="concept-card">
-          <h3>Safety rules</h3>
-          <ul>
-            <li>Do not automatically release access codes.</li>
-            <li>Flag urgent or sensitive situations.</li>
-            <li>Confirm prices, availability, and procedures before replying.</li>
-          </ul>
-        </div>
-
-        <div class="concept-card">
-          <h3>Course concepts</h3>
-          <span class="tag">Human-in-the-loop</span>
-          <span class="tag">AI governance</span>
-          <span class="tag">Prediction–decision gap</span>
-          <span class="tag">Operational efficiency</span>
-        </div>
-      </aside>
+<!-- HEADER -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-icon">✈️</div>
+    <div>
+      <div class="logo-text">Bellingham Aviation Services</div>
+      <div class="logo-sub">AI Email Assistant — Internal Tool</div>
     </div>
+  </div>
+  <div class="header-badge">
+    <div class="pulse-dot"></div>
+    KBLI · System Online
+  </div>
+</header>
 
-    <footer>
-      Internal prototype only — all operational details should be verified by BAS staff before being shared with customers.
-    </footer>
+<!-- MAIN -->
+<main class="main">
+
+  <div class="title-row">
+    <div class="page-title">Compose Customer Email</div>
+    <div class="page-subtitle">Fill in the details below — the assistant will draft a professional email ready for your review.</div>
   </div>
 
-  <script>
-    const chatBox = document.getElementById('chatBox');
-    const userInput = document.getElementById('userInput');
+  <!-- LEFT: FORM -->
+  <div>
+    <div class="card">
+      <div class="card-label">Customer Details</div>
 
-    function usePrompt(text) {
-      userInput.value = text;
-      sendMessage();
-    }
+      <div class="form-row">
+        <label>Customer Name</label>
+        <input type="text" id="customerName" placeholder="e.g. John Smith">
+      </div>
 
-    function sendMessage() {
-      const text = userInput.value.trim();
-      if (!text) return;
+      <div class="form-row">
+        <label>Request Type</label>
+        <select id="requestType">
+          <option value="">— Select request type —</option>
+          <option value="rental_car">Rental Car Request</option>
+          <option value="hotel">Hotel Recommendation</option>
+          <option value="flight_training">Flight Training Inquiry</option>
+          <option value="arrival">Arrival Notification</option>
+          <option value="weather_delay">Weather Delay</option>
+          <option value="after_hours">After-Hours Arrival</option>
+          <option value="fuel">Fuel Service Request</option>
+          <option value="general">General Customer Question</option>
+        </select>
+      </div>
 
-      addMessage(text, 'user');
-      userInput.value = '';
-
-      const warning = checkForWarning(text);
-      if (warning) {
-        addWarning(warning);
-      }
-
-      const response = generateResponse(text);
-      setTimeout(() => addMessage(response, 'bot'), 300);
-    }
-
-    function addMessage(text, sender) {
-      const message = document.createElement('div');
-      message.className = `message ${sender}`;
-
-      const bubble = document.createElement('div');
-      bubble.className = 'bubble';
-      bubble.textContent = text;
-
-      message.appendChild(bubble);
-      chatBox.appendChild(message);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    function addWarning(text) {
-      const warning = document.createElement('div');
-      warning.className = 'warning';
-      warning.textContent = text;
-      chatBox.appendChild(warning);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    function checkForWarning(input) {
-      const lower = input.toLowerCase();
-      const urgentWords = ['urgent', 'tonight', 'no answer', 'locked out', 'after-hours', 'after hours', 'access code', 'hangar space', 'departing 0600', '0600', 'emergency', 'customs'];
-      const found = urgentWords.some(word => lower.includes(word));
-
-      if (found) {
-        return 'Human review required: This request may involve urgency, access, regulatory information, or operational availability. Staff should verify details and consider calling the customer directly before sending a written response.';
-      }
-      return '';
-    }
-
-    function generateResponse(input) {
-      const lower = input.toLowerCase();
-
-      if (lower.includes('access code') || lower.includes('locked out')) {
-        return `Staff guide: Facility access request\n\nWhat to check:\n• Verify the customer, aircraft, ETA, and reason for access.\n• Do not automatically provide access details in an AI-generated response.\n• If the access information is posted at the entrance, staff may explain where to look only if that is appropriate under current BAS policy.\n• If the customer says they already called and received no answer, consider calling them directly.\n\nSuggested staff response:\nHello,\n\nThank you for reaching out. I apologize that you were not able to reach us by phone. Since this involves after-hours access, I want to make sure we verify the details before providing instructions. I will review your arrival information and follow up directly with the next steps.\n\nBest,\nBellingham Aviation Services`;
-      }
-
-      if (lower.includes('after-hours') || lower.includes('after hours') || lower.includes('tonight')) {
-        return `Staff guide: After-hours arrival\n\nWhat to check:\n• Customer name and contact number\n• Aircraft tail number and type\n• ETA and departure time\n• Fuel needs\n• Parking or hangar request\n• Whether the situation needs a direct phone call\n\nSuggested staff response:\nHello,\n\nThank you for letting us know about your after-hours arrival. I apologize if you were unable to reach us by phone. We will review your arrival details, parking needs, and any service requests so we can provide the most accurate information.\n\nPlease note that hangar space must be confirmed by BAS staff and depends on availability. For urgent operational needs, direct phone follow-up may be the best next step.\n\nBest,\nBellingham Aviation Services`;
-      }
-
-      if (lower.includes('fuel') || lower.includes('jet-a') || lower.includes('avgas')) {
-        return `Staff guide: Fuel question\n\nWhat to check:\n• Fuel type: Jet-A or AvGas\n• Current fuel pricing\n• Full-service vs. self-service availability\n• Aircraft type and requested quantity\n• Arrival time and whether staff needs to be ready on the ramp\n\nSuggested staff response:\nHello,\n\nThank you for reaching out. We can assist with fuel service at KBLI. To provide the most accurate information, could you please confirm your aircraft type, tail number, arrival time, and requested fuel type or quantity?\n\nFuel pricing and service availability should be confirmed with current BAS operations before finalizing the response.\n\nBest,\nBellingham Aviation Services`;
-      }
-
-      if (lower.includes('rental car') || lower.includes('car')) {
-        return `Staff guide: Rental car request\n\nWhat to check:\n• Customer name and phone number\n• Arrival date and time\n• Driver information, if required\n• Vehicle preference\n• Rental company availability\n• Whether the car should be staged for arrival\n\nSuggested staff response:\nHello,\n\nThank you for contacting Bellingham Aviation Services. We can help coordinate a rental car for your arrival. Please send your arrival date and time, phone number, driver information, and any vehicle preference so we can begin the request.\n\nOnce availability is confirmed, we will follow up with the next steps.\n\nBest,\nBellingham Aviation Services`;
-      }
-
-      if (lower.includes('private pilot') || lower.includes('student') || lower.includes('flight training') || lower.includes('license')) {
-        return `Staff guide: New student / private pilot license question\n\nWhat to check:\n• Is the person brand new or do they already have flight hours?\n• Are they asking about costs, timeline, requirements, or scheduling?\n• Should they be directed to flight school staff for exact pricing and next steps?\n\nSuggested staff response:\nHello,\n\nThank you for your interest in flight training. The path to earning a private pilot license can vary depending on your schedule, prior experience, and how often you train. If you already have flight hours, that may change the estimate and next steps.\n\nWe would be happy to connect you with the appropriate flight school contact so they can provide the most accurate information about training requirements, costs, and scheduling.\n\nBest,\nBellingham Aviation Services`;
-      }
-
-      if (lower.includes('hotel') || lower.includes('lodging')) {
-        return `Staff guide: Hotel or crew lodging question\n\nWhat to check:\n• Number of guests\n• Arrival and departure dates\n• Transportation needs\n• Preferred hotel type or budget\n• Current hotel availability if BAS is making a recommendation\n\nSuggested staff response:\nHello,\n\nThank you for reaching out. We can provide general nearby hotel options and help point you toward transportation resources for your stay. To make the best recommendation, could you please confirm your arrival date, departure date, number of guests, and whether you will need transportation from the airport?\n\nBest,\nBellingham Aviation Services`;
-      }
-
-      if (lower.includes('hangar')) {
-        return `Staff guide: Hangar space request\n\nWhat to check:\n• Tail number\n• Aircraft type and size\n• Arrival and departure time\n• Overnight vs. short-term request\n• Current hangar availability\n\nSuggested staff response:\nHello,\n\nThank you for your hangar request. Hangar space depends on aircraft size, timing, and current availability. Could you please confirm your tail number, aircraft type, arrival time, and planned departure time?\n\nOnce BAS staff reviews availability, we can confirm whether hangar space is possible or provide ramp parking options.\n\nBest,\nBellingham Aviation Services`;
-      }
-
-      if (lower.includes('customs') || lower.includes('international')) {
-        return `Staff guide: Customs or international arrival\n\nWhat to check:\n• Do not give final regulatory guidance without verification.\n• Confirm whether the customer has contacted the appropriate customs office.\n• Verify arrival time, aircraft information, and any BAS support needed.\n• Staff should review current customs procedures before replying.\n\nSuggested staff response:\nHello,\n\nThank you for reaching out about your international arrival. BAS can help with general arrival support, but official customs requirements should be confirmed with the appropriate customs authority.\n\nPlease send your planned arrival time, aircraft tail number, and any services you need from BAS, and we will review what support we can provide.\n\nBest,\nBellingham Aviation Services`;
-      }
-
-      if (lower.includes('catering') || lower.includes('food')) {
-        return `Staff guide: Catering request\n\nWhat to check:\n• Date and time needed\n• Number of people\n• Dietary restrictions\n• Type of food or beverage requested\n• Vendor availability and required notice\n\nSuggested staff response:\nHello,\n\nThank you for your catering request. Could you please confirm your arrival time, number of passengers or crew, preferred items, and any dietary restrictions?\n\nOnce we have those details, BAS staff can review availability and coordinate the request.\n\nBest,\nBellingham Aviation Services`;
-      }
-
-      if (lower.includes('deicing') || lower.includes('ice') || lower.includes('winter')) {
-        return `Staff guide: Deicing question\n\nWhat to check:\n• Weather conditions\n• Aircraft type\n• Staff and equipment availability\n• Timing of departure\n• Whether the customer needs an estimate or confirmation\n\nSuggested staff response:\nHello,\n\nThank you for checking in about deicing. Deicing availability depends on weather, staffing, equipment, aircraft type, and timing. Could you please confirm your aircraft type, tail number, and planned departure time?\n\nBAS staff will review conditions and availability before confirming service.\n\nBest,\nBellingham Aviation Services`;
-      }
-
-      if (lower.includes('parking') || lower.includes('tie-down') || lower.includes('tiedown')) {
-        return `Staff guide: Parking / tie-down request\n\nWhat to check:\n• Aircraft type and tail number\n• ETA and departure time\n• Overnight or short-term parking\n• Ramp capacity and weather concerns\n\nSuggested staff response:\nHello,\n\nThank you for contacting BAS. Aircraft parking depends on aircraft size, timing, and ramp availability. Could you please confirm your aircraft type, tail number, ETA, and planned departure time?\n\nOnce reviewed, BAS staff can confirm parking or tie-down options.\n\nBest,\nBellingham Aviation Services`;
-      }
-
-      return `Staff guide: General customer question\n\nWhat to check:\n• What service is the customer asking about?\n• Is the request urgent or after-hours?\n• Does it involve pricing, access, safety, or availability?\n• Should staff call the customer instead of only emailing?\n\nSuggested staff response:\nHello,\n\nThank you for reaching out to Bellingham Aviation Services. To make sure we provide the most accurate information, could you please share a few more details about your request, including your arrival time, aircraft information if applicable, and the service you need?\n\nBest,\nBellingham Aviation Services`;
-    }
-
-    function clearChat() {
-      chatBox.innerHTML = `
-        <div class="message bot">
-          <div class="bubble">
-            Hello! I’m the BAS Internal Flight Service Assistant. I am designed for staff use, not direct customer use.\n\nAsk me what to do when a customer asks about fuel, rental cars, after-hours arrivals, hangar space, hotel recommendations, customs, deicing, or student pilot questions. I can provide a staff checklist, a suggested response, and any human-review warnings.
-          </div>
+      <div class="form-row-split">
+        <div class="form-row">
+          <label>Aircraft Tail Number</label>
+          <input type="text" id="tailNumber" placeholder="e.g. N123AB">
         </div>
-      `;
+        <div class="form-row">
+          <label>Arrival Date &amp; Time</label>
+          <input type="datetime-local" id="arrivalTime">
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 1.25rem;">
+      <div class="card-label">Service Options</div>
+
+      <label style="margin-bottom: 8px;">Flags</label>
+      <div class="toggle-row">
+        <div class="toggle-item" id="toggle-weather" onclick="toggleItem('weather')">
+          <div class="toggle-check" id="check-weather"></div>
+          <span class="toggle-label">⛈ Weather Delay</span>
+        </div>
+        <div class="toggle-item" id="toggle-rental" onclick="toggleItem('rental')">
+          <div class="toggle-check" id="check-rental"></div>
+          <span class="toggle-label">🚗 Rental Car</span>
+        </div>
+        <div class="toggle-item" id="toggle-overnight" onclick="toggleItem('overnight')">
+          <div class="toggle-check" id="check-overnight"></div>
+          <span class="toggle-label">🌙 Overnight Parking</span>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label>Additional Notes</label>
+        <textarea id="notes" placeholder="e.g. Student has 45 flight hours. Crew requesting overnight tie-down. International arrival — customs coordination needed."></textarea>
+      </div>
+
+      <button class="btn-generate" onclick="generateEmail()">
+        <span id="btn-icon">✦</span>
+        <span id="btn-text">Generate Email Draft</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- RIGHT: OUTPUT -->
+  <div class="output-panel">
+    <div class="card" style="min-height: 400px;">
+      <div class="card-label">Generated Draft</div>
+
+      <!-- Warning banner -->
+      <div class="warning-banner" id="warningBanner">
+        <div class="warning-title" id="warningTitle">⚠ Review before generating</div>
+        <ul class="warning-list" id="warningList"></ul>
+        <div class="warning-proceed" id="warningProceed"></div>
+      </div>
+
+      <!-- Empty state -->
+      <div class="output-empty" id="emptyState">
+        <div class="empty-icon">📧</div>
+        <div class="empty-title">No draft yet</div>
+        <div class="empty-sub">Complete the form and click Generate to create a professional email draft.</div>
+      </div>
+
+      <!-- Loading -->
+      <div class="generating-overlay" id="loadingState">
+        <div class="radar">
+          <div class="radar-ring"></div>
+          <div class="radar-sweep"></div>
+        </div>
+        <div class="generating-text">Composing draft...</div>
+      </div>
+
+      <!-- Output -->
+      <div class="email-output" id="emailOutput">
+        <div class="email-subject">
+          <span class="subject-label">Subject</span>
+          <span class="subject-text" id="emailSubject"></span>
+        </div>
+        <div class="email-body" id="emailBody"></div>
+        <div class="email-actions">
+          <button class="btn-action btn-copy" id="copyBtn" onclick="copyEmail()">
+            📋 Copy Email
+          </button>
+          <button class="btn-action btn-clear" onclick="clearAll()">
+            ↺ Clear
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">BAS Internal Tool · For staff use only · Always review before sending · KBLI — Bellingham International Airport</div>
+
+</main>
+
+<script>
+  const toggles = { weather: false, rental: false, overnight: false };
+
+  function toggleItem(key) {
+    toggles[key] = !toggles[key];
+    const el = document.getElementById('toggle-' + key);
+    const ch = document.getElementById('check-' + key);
+    if (toggles[key]) {
+      el.classList.add('active');
+      ch.textContent = '✓';
+    } else {
+      el.classList.remove('active');
+      ch.textContent = '';
+    }
+  }
+
+  function formatDatetime(val) {
+    if (!val) return null;
+    const d = new Date(val);
+    const dateStr = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    const hours = String(d.getHours()).padStart(2, '0');
+    const mins = String(d.getMinutes()).padStart(2, '0');
+    return `${dateStr} at ${hours}${mins}L`;
+  }
+
+  // Cross-reference map: email type → keywords that suggest a mismatch
+  const typeKeywords = {
+    rental_car:      { signals: /rental|car|vehicle|transport|uber|lyft|drive/i,       conflicts: { flight_training: /lesson|ppl|certificate|instrument|training/i, fuel: /jet.?a|avgas|100ll|gallons|fuel/i } },
+    hotel:           { signals: /hotel|lodging|room|stay|overnight|sleep/i,            conflicts: { fuel: /jet.?a|avgas|fuel/i, flight_training: /ppl|certificate|lesson/i } },
+    flight_training: { signals: /lesson|train|ppl|certificate|instrument|solo|hours/i, conflicts: { fuel: /jet.?a|avgas|gallons/i, arrival: /arriving|eta|inbound/i } },
+    arrival:         { signals: /arriv|inbound|eta|landing|coming in/i,                conflicts: { flight_training: /ppl|certificate|lesson|ground school/i } },
+    weather_delay:   { signals: /weather|delay|ifr|vfr|ceiling|visibility|atis/i,      conflicts: { flight_training: /ppl|certificate|lesson/i } },
+    after_hours:     { signals: /after.?hour|late|tonight|evening|night|pm/i,          conflicts: { flight_training: /ppl|certificate|lesson/i } },
+    fuel:            { signals: /fuel|jet.?a|avgas|100ll|gallon|prist/i,               conflicts: { flight_training: /ppl|certificate|lesson/i, hotel: /hotel|lodging|room/i } },
+    general:         { signals: null, conflicts: {} }
+  };
+
+  function validateInputs(name, type, tail, notes) {
+    const errors = [];    // hard blocks — shown in red, generation stops
+    const warnings = [];  // soft flags — shown in amber, generation proceeds after
+
+    // ── Hard errors ──
+    if (!type) {
+      errors.push('Request type is required — please select one from the dropdown.');
+    }
+    if (!name || /^\d+$/.test(name)) {
+      errors.push(`"${name || '(blank)'}" does not look like a customer name. Please enter a first and last name.`);
+    }
+    if (name && name.split(' ').length === 1 && name.length > 2 && !/^\d+$/.test(name)) {
+      warnings.push(`Only one name entered ("${name}") — consider adding a last name for a more professional greeting.`);
     }
 
-    userInput.addEventListener('keydown', function(event) {
-      if (event.key === 'Enter') {
-        sendMessage();
+    // ── Tail number format ──
+    const isCanadian = /^C[-]?[FGIH]/i.test(tail);
+    const isValidUS  = /^N[0-9]{1,5}[A-Z]{0,2}$/i.test(tail.replace(/-/g,''));
+    if (tail && !isValidUS && !isCanadian) {
+      warnings.push(`Tail number "${tail}" is not a recognized US (N-number) or Canadian (C-F/C-G) format. Double-check before sending.`);
+    }
+    if (tail && isCanadian) {
+      warnings.push(`Canadian aircraft detected (${tail}). International arrival procedures apply — CBP pre-coordination recommended. Consider noting this in the email.`);
+    }
+
+    // ── Cross-reference notes vs selected type ──
+    if (type && notes) {
+      const n = notes.toLowerCase();
+      const map = typeKeywords[type];
+
+      // Check if notes strongly suggest a DIFFERENT email type
+      for (const [otherType, pattern] of Object.entries(map?.conflicts || {})) {
+        if (pattern.test(n)) {
+          const labels = {
+            rental_car: 'Rental Car Request', hotel: 'Hotel Recommendation',
+            flight_training: 'Flight Training Inquiry', arrival: 'Arrival Notification',
+            weather_delay: 'Weather Delay', after_hours: 'After-Hours Arrival',
+            fuel: 'Fuel Service Request', general: 'General Question'
+          };
+          const currentLabel = labels[type];
+          const suggestedLabel = labels[otherType];
+          warnings.push(`Notes mention topics related to "${suggestedLabel}" but the selected type is "${currentLabel}." Verify the correct type is selected.`);
+        }
       }
+
+      // Check if notes mention something the type doesn't cover
+      if (type !== 'general' && /cancel|refund|complaint|incorrect|wrong|mistake/.test(n)) {
+        warnings.push('Notes mention a cancellation or complaint — none of the current email types cover this. Consider using General Question or handling manually.');
+      }
+    }
+
+    return { errors, warnings };
+  }
+
+  function generateEmail() {
+    let name = document.getElementById('customerName').value.trim();
+    const type = document.getElementById('requestType').value;
+    const tailRaw = document.getElementById('tailNumber').value.trim();
+    const tail = tailRaw.toUpperCase().replace(/-/g, '');
+    if (tailRaw) document.getElementById('tailNumber').value = tail;
+    const arrival = document.getElementById('arrivalTime').value;
+    const notes = document.getElementById('notes').value.trim();
+
+    const { errors, warnings } = validateInputs(name, type, tail, notes);
+    const banner = document.getElementById('warningBanner');
+    const bannerTitle = document.getElementById('warningTitle');
+    const bannerList = document.getElementById('warningList');
+    const bannerProceed = document.getElementById('warningProceed');
+
+    // Reset banner
+    banner.style.display = 'none';
+    banner.classList.remove('error');
+    bannerList.innerHTML = '';
+
+    if (errors.length > 0) {
+      banner.classList.add('error');
+      bannerTitle.textContent = '✖ Cannot generate — please fix the following:';
+      errors.forEach(e => { const li = document.createElement('li'); li.textContent = e; bannerList.appendChild(li); });
+      banner.style.display = 'block';
+      document.getElementById('emptyState').style.display = 'none';
+      document.getElementById('emailOutput').style.display = 'none';
+      document.getElementById('loadingState').style.display = 'none';
+      return;
+    }
+
+    if (warnings.length > 0) {
+      bannerTitle.textContent = '⚠ Heads up — review before sending:';
+      warnings.forEach(w => { const li = document.createElement('li'); li.textContent = w; bannerList.appendChild(li); });
+      bannerProceed.textContent = 'Draft generated below — please review carefully before sending.';
+      banner.style.display = 'block';
+    }
+
+    if (!name || /^\d+$/.test(name)) name = 'Valued Customer';
+
+    // Show loading
+    document.getElementById('emptyState').style.display = 'none';
+    document.getElementById('emailOutput').style.display = 'none';
+    document.getElementById('loadingState').style.display = 'flex';
+
+    setTimeout(() => {
+      const result = buildEmail(name, type, tail, arrival, notes);
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('emailSubject').textContent = result.subject;
+
+      const bodyEl = document.getElementById('emailBody');
+      bodyEl.textContent = result.body;
+
+      const banner = document.getElementById('warningBanner');
+      const bannerTitle = document.getElementById('warningTitle');
+      const bannerList = document.getElementById('warningList');
+      const bannerProceed = document.getElementById('warningProceed');
+
+      if (result.isComplex) {
+        bodyEl.style.borderColor = 'rgba(232,160,32,0.5)';
+        bodyEl.style.background = 'rgba(232,160,32,0.05)';
+        banner.classList.remove('error');
+        bannerTitle.textContent = '\u26a0 Complex request \u2014 manual editing required';
+        bannerList.innerHTML = '';
+        const li = document.createElement('li');
+        li.textContent = 'This message covers multiple service areas. A starter draft has been generated with a [STAFF NOTE] placeholder \u2014 fill in the details and remove the note before sending.';
+        bannerList.appendChild(li);
+        bannerProceed.textContent = 'Do not send this draft as-is.';
+        banner.style.display = 'block';
+      } else if (result.isUrgent) {
+        // Human-in-the-loop safety banner for urgent/sensitive requests
+        bodyEl.style.borderColor = 'rgba(226,75,74,0.45)';
+        bodyEl.style.background = 'rgba(226,75,74,0.04)';
+        banner.classList.add('error');
+        bannerTitle.textContent = '\u26a0 Human review required';
+        bannerList.innerHTML = '';
+        const items = [
+          'This request appears urgent or operationally sensitive.',
+          'A staff member should review this draft before sending.',
+          'Consider calling the customer directly rather than relying on email.',
+          'Do not send access codes, hangar confirmations, or security details without verifying current status first.',
+        ];
+        items.forEach(txt => {
+          const li = document.createElement('li');
+          li.textContent = txt;
+          bannerList.appendChild(li);
+        });
+        bannerProceed.textContent = 'Review all [STAFF:] placeholders and remove them before sending.';
+        banner.style.display = 'block';
+      } else {
+        bodyEl.style.borderColor = '';
+        bodyEl.style.background = '';
+        // Only hide banner if it wasn't already showing a pre-generation warning
+        if (!banner.style.display || banner.classList.contains('error')) {
+          // leave any pre-gen amber warnings visible
+        }
+      }
+
+      document.getElementById('emailOutput').style.display = 'block';
+    }, 1400);
+  }
+
+  function buildEmail(name, type, tail, arrival, notes) {
+    const firstName = name.split(' ')[0];
+    const arrivalStr = formatDatetime(arrival);
+    const n = notes.toLowerCase();
+
+    // ── Silent keyword detection from notes ──
+    const hasCrew       = /crew|captain|first officer|fo\b/.test(n);
+    const tailIsCanadian = /^C[-]?[FGIH]/i.test(tail);
+    const hasIntl       = tailIsCanadian || /international|customs|cbp|canada|victoria|vancouver|border/.test(n);
+    const hasSUV        = /suv|large|full.?size|big vehicle|7 pass|8 pass/.test(n);
+    const hasHours      = /(\d+)\s*hour/.test(n);
+    const priorHours    = hasHours ? n.match(/(\d+)\s*hour/)[1] : null;
+    const hasGroundSchool = /ground school|written|knowledge test/.test(n);
+    const hasHangar     = /hangar/.test(n);
+    const hasJetA       = /jet.?a/.test(n);
+    const hasAvgas      = /avgas|100ll/.test(n);
+    const hasPrist      = /prist/.test(n);
+    const hasGallons    = /(\d+)\s*gal/.test(n);
+    const gallons       = hasGallons ? n.match(/(\d+)\s*gal/)[1] : null;
+    const hasWing       = /right wing|left wing/.test(n);
+    const wingPref      = hasWing ? (n.includes('right wing') ? 'right wing' : 'left wing') : null;
+    const hasAccessible  = /wheelchair|accessibility|mobility/.test(n);
+    const hasBudgetConcern = /cheap|budget|afford|expensive|cost|price|how much|too much|save money|discount/.test(n);
+    const hasUrgency       = /urgent|asap|emergency|right away|immediately|need now|tonight|no answer|tried.{0,20}call|can.?t reach|locked out|departing early|departing.{0,10}morning|leaving early/.test(n);
+    const hasMissedCall    = /no answer|tried.{0,20}call|can.?t reach|nobody answered|not picking up/.test(n);
+    const hasAccessRequest = /access code|access.{0,10}door|lobby code|door code|how.{0,10}get in|locked out/.test(n);
+    const hasEarlyDepart   = /depart.{0,15}(0[3-7]\d\d|early|dawn|sunrise|0600|0500|0400|0700)/.test(n);
+    const isCanadianNote = /canada|victoria|vancouver|bc|canadian|c-f|c-g/.test(n);
+    const hasDeparture  = /depart.*(am|pm|\d{3,4})/.test(n);
+    const depTime       = hasDeparture ? n.match(/depart.*?(\d{1,2}(?::\d{2})?\s*(?:am|pm)?)/i)?.[1] : null;
+    const hasPassengers = /(\d+)\s*(passenger|pax|people|person)/.test(n);
+    const paxCount      = hasPassengers ? n.match(/(\d+)\s*(passenger|pax|people|person)/)[1] : null;
+
+    const weatherNote = toggles.weather
+      ? '\n\nPlease be aware that current weather conditions in the Bellingham area may impact your arrival. Our team is monitoring the situation and will coordinate with you on any ETA adjustments. We recommend checking ATIS on 118.05 before departure.'
+      : '';
+
+    const rentalNote = toggles.rental
+      ? `\n\nWe have noted your rental car request. Our team will coordinate a vehicle for your arrival${hasSUV ? ' — a full-size SUV will be requested specifically' : paxCount ? ` for ${paxCount} passengers` : ''}. Please confirm any preferences and we will do our best to accommodate.`
+      : '';
+
+    const overnightNote = toggles.overnight
+      ? `\n\n${hasHangar ? 'Hangar space has been noted as your preference. We will confirm availability and reserve a spot — hangar rates are $85/night, subject to availability.' : 'Overnight tie-down will be arranged for your aircraft at our standard rate of $35/night.'} ${depTime ? `We have your estimated departure noted as approximately ${depTime}.` : 'Please confirm your expected departure time so we can plan accordingly.'}`
+      : '';
+
+    const sig = `\n\nBest regards,\nFront Desk Staff\nBellingham Aviation Services\n📞 (360) 676-7211  |  ✉ ops@bellinghamaviation.com\nKBLI — Bellingham International Airport`;
+
+    const intlNote = hasIntl
+      ? '\n\nWe have noted this as an international arrival. Please ensure you have filed a APIS manifest and contacted U.S. Customs and Border Protection (CBP) at (360) 332-8511 prior to departure. KBLI is a designated international airport and CBP can be pre-arranged for your arrival.'
+      : '';
+
+    const accessNote = hasAccessible
+      ? '\n\nWe have noted the accessibility requirement. Our team will ensure a wheelchair-accessible vehicle is requested and that our facility is prepared to assist upon arrival.'
+      : '';
+
+    const crewNote = hasCrew
+      ? '\n\nWe have noted this is a crew arrival. Pilot lounge and crew rest facilities are available in the FBO.'
+      : '';
+
+    const templates = {
+
+      rental_car: {
+        subject: `Rental Car Coordination — ${name} | KBLI Arrival`,
+        body: `Hello ${firstName},\n\nThank you for contacting Bellingham Aviation Services. We are happy to assist with ground transportation for your upcoming visit to KBLI.${arrivalStr ? `\n\nExpected arrival: ${arrivalStr}` : ''}${tail ? `\nAircraft: ${tail}` : ''}${rentalNote || '\n\nOur team will coordinate a rental vehicle through our local partner agency. Options range from economy sedans to full-size SUVs, subject to availability.'}${accessNote}${weatherNote}${overnightNote}${intlNote}${crewNote}\n\n${hasUrgency ? 'We understand this is time-sensitive — our team is prioritizing your request now. ' : ''}Please don't hesitate to reach out with updates to your itinerary.${sig}`
+      },
+
+      hotel: {
+        subject: `Hotel Recommendations — KBLI Area | ${name}`,
+        body: `Hello ${firstName},\n\nThank you for reaching out to Bellingham Aviation Services. We are glad to help with hotel recommendations near KBLI.${arrivalStr ? `\n\nFor your arrival on ${arrivalStr}, here are options we frequently recommend:` : '\n\nHere are a few options we frequently recommend:'}\n\n• Hampton Inn Bellingham — 3 miles from KBLI, complimentary shuttle available\n• Fairfield Inn & Suites — Downtown Bellingham, 5 miles from the airport\n• Chrysalis Inn & Spa — Waterfront boutique property, excellent for extended stays\n\nAll three are familiar with pilot and crew schedules. We recommend calling ahead to mention your ETA.${accessNote}${weatherNote}${overnightNote}${intlNote}${sig}`
+      },
+
+      flight_training: {
+        subject: `Flight Training Information — Bellingham Aviation Services`,
+        body: `Hello ${firstName},\n\nThank you for your interest in flight training at Bellingham Aviation Services. We would love to help you reach your aviation goals.\n\nHere is an overview of our current programs:\n\n✈ Private Pilot License (PPL)\n  FAA minimum: 40 flight hours — most students finish in 60–70 hours\n  Aircraft rental: approx. $145–$175/hr (wet, fuel included)\n  Instructor fee: approx. $55–$70/hr\n  Ground school & materials: approx. $350–$500\n  FAA medical certificate: approx. $100–$175\n  Checkride examiner fee: approx. $600–$900\n  Estimated total: $10,500–$15,000 depending on pace and frequency\n\n✈ Instrument Rating (add-on)\n  40+ additional instrument hours required\n  Estimated additional cost: $6,000–$9,000\n${priorHours ? `\nBased on your ${priorHours} hours of prior experience, you are well on your way. We can assess where you stand in your first lesson and build a plan from there.` : ''}${hasGroundSchool ? '\n\nSince you have already completed ground school, we can focus your time and budget on flight hours — this is a great way to keep costs down.' : '\n\nFlying 2–3 times per week significantly reduces total cost by minimizing relearning time between sessions.'}\n\nWe also offer certified simulator time at a reduced hourly rate for procedure practice and instrument work.\n\n${hasBudgetConcern ? 'We understand that flight training is a significant investment. We want to be transparent: earning a PPL at any reputable school in 2026 realistically costs $10,500–$15,000 due to FAA hour requirements, aircraft operating costs, and instructor time. That said, we will work with you to keep costs as low as possible — simulator time, consistent scheduling, and self-study for the written exam are the three biggest ways to reduce your total spend.' : ''}We would be happy to schedule a no-obligation discovery flight ($150) to get you started. Please reply or call us to set a date.${sig}`
+      },
+
+      arrival: {
+        subject: `Arrival Coordination Confirmed — ${tail || name} | KBLI`,
+        body: `Hello ${firstName},\n\nWe have received your arrival notification and look forward to welcoming you to Bellingham Aviation Services.${arrivalStr ? `\n\nExpected arrival: ${arrivalStr}` : ''}${tail ? `\nAircraft: ${tail}` : ''}\n\nUpon arrival, monitor CTAF on 122.7 and taxi to the BAS ramp on the west side of the field. Our ground crew will be ready to assist with parking, fueling, and any additional service needs.${intlNote}${crewNote}${accessNote}${weatherNote}${rentalNote}${overnightNote}${sig}`
+      },
+
+      weather_delay: {
+        subject: `Weather Advisory — Updated ETA | ${tail || name}`,
+        body: `Hello ${firstName},\n\nWe understand that current weather conditions may be impacting your flight plans. Our team at Bellingham Aviation Services is here to help.\n\nCurrent conditions at KBLI are being monitored. We recommend:\n• Checking ATIS on 118.05 and reviewing current PIREPs\n• Filing IFR if ceiling and visibility permit\n• Identifying an alternate should conditions remain below minimums\n\nIf your arrival time or service needs change, please notify us as early as possible and we will adjust accordingly.${arrivalStr ? `\n\nOriginally scheduled arrival: ${arrivalStr}` : ''}${tail ? `\nAircraft on file: ${tail}` : ''}${rentalNote}${overnightNote}${sig}`
+      },
+
+      after_hours: {
+        subject: `After-Hours Arrival — ${tail || name} | KBLI`,
+        body: (() => {
+          let b = `Hello ${firstName},\n\n`;
+
+          // Apologize if they mentioned a missed call
+          if (hasMissedCall) {
+            b += `We sincerely apologize that we missed your call. We understand how stressful an after-hours situation can be, and we want to make sure you have everything you need.\n\n`;
+          } else if (hasUrgency) {
+            b += `We have received your message and understand the urgency of your situation. Our team is responding as quickly as possible.\n\n`;
+          } else {
+            b += `Thank you for notifying us of your after-hours arrival. We want to make sure everything goes smoothly.\n\n`;
+          }
+
+          // Arrival time
+          if (arrivalStr) b += `Expected arrival: ${arrivalStr}\n`;
+          if (tail) b += `Aircraft: ${tail}\n`;
+          if (arrivalStr || tail) b += `\n`;
+
+          // General after-hours guidance
+          b += `Here is what you can expect upon arrival at KBLI:\n`;
+          b += `• Self-serve fuel (AvGas 100LL & Jet-A) is available 24/7 on the south ramp\n`;
+          b += `• Tie-down rings are clearly marked — our ramp is lit and accessible at all times\n`;
+          b += `• On-call line for urgent operational needs: (360) 676-7211\n`;
+
+          // Access code — never provide, always defer to staff
+          if (hasAccessRequest) {
+            b += `\nRegarding FBO access: for security reasons, access information must be verified and provided directly by a BAS staff member. [STAFF: Please confirm the current access code or entry procedure before sending this email, and add that detail here if appropriate.]\n`;
+          } else {
+            b += `• FBO lobby access details will be confirmed by a staff member — please reply or call if you need entry instructions\n`;
+          }
+
+          // Hangar — never confirm, always defer
+          if (hasHangar) {
+            b += `\nRegarding hangar space: we have noted your request. Hangar availability must be confirmed by a staff member before we can guarantee space. [STAFF: Please check hangar availability before sending and update this line with a confirmed yes or no.]\n`;
+          }
+
+          // Early departure note
+          if (hasEarlyDepart) {
+            b += `\nWe have noted your early departure. Our team will ensure your aircraft is accessible and that any services you need are ready before you leave.\n`;
+          }
+
+          b += `${weatherNote}${rentalNote}${overnightNote}`;
+          b += `\n\nPlease do not hesitate to call our on-call line at (360) 676-7211 if you need immediate assistance upon arrival. We are here to help.`;
+          b += sig;
+          return b;
+        })(),
+        isUrgent: hasUrgency || hasMissedCall || hasAccessRequest
+      },
+
+      fuel: {
+        subject: `Fuel Service Confirmation — ${tail || name} | KBLI`,
+        body: `Hello ${firstName},\n\nThank you for contacting Bellingham Aviation Services regarding fuel service. We will have everything ready for your arrival.${arrivalStr ? `\n\nScheduled arrival: ${arrivalStr}` : ''}${tail ? `\nAircraft: ${tail}` : ''}\n\nFuel order on file:\n• Type: ${hasJetA ? 'Jet-A' : hasAvgas ? 'AvGas 100LL' : 'Please confirm fuel type — AvGas 100LL or Jet-A'}${gallons ? `\n• Quantity: ${gallons} gallons` : ''}${wingPref ? `\n• Wing preference: ${wingPref} first` : ''}${hasPrist ? '\n• Prist additive: confirmed' : '\n• Prist: not requested — please advise if needed'}\n\nFull-service fueling includes ramp crew for marshaling, chocks, and tie-down at no extra charge.${weatherNote}${overnightNote}${sig}`
+      },
+
+      general: {
+        subject: `Your Inquiry — Bellingham Aviation Services`,
+        body: (() => {
+          let body = `Hello ${firstName},\n\nThank you for reaching out to Bellingham Aviation Services. We have reviewed your message and want to address each point directly.\n`;
+
+          if (hasIntl) body += `\nRegarding your international arrival: KBLI is a designated port of entry. Please pre-coordinate with U.S. Customs and Border Protection at (360) 332-8511 and ensure your APIS manifest is filed before departure. Our team will handle ramp coordination once CBP clearance is confirmed.`;
+
+          if (toggles.weather || /weather|delay|can.?t leave|not sure when|stuck/.test(n)) {
+            body += `\nRegarding the weather situation: we completely understand and are sorry for the disruption. Please monitor ATIS on 118.05 and hold until conditions improve. There is no penalty for a delayed arrival — just keep us updated on your revised ETA and we will adjust all arrangements accordingly.`;
+          }
+
+          if (toggles.rental || /rental|car|vehicle/.test(n)) {
+            const hasCancel = /cancel|won.?t make|not going to make|might not make/.test(n);
+            body += hasCancel
+              ? `\nRegarding your rental car: since your arrival is uncertain, we recommend contacting the rental agency directly to request a hold or late pickup rather than cancelling outright, as same-day rebooking can be difficult. If you need us to call on your behalf, let us know.`
+              : `\nRegarding your rental car: we have noted your request and will coordinate a vehicle for your arrival. Please confirm once you have a firm ETA.`;
+          }
+
+          if (/hotel|lodging|room|reservation/.test(n)) {
+            const hasCancel = /cancel|won.?t make|not going to make|might not make/.test(n);
+            body += hasCancel
+              ? `\nRegarding your hotel reservation: we recommend calling the hotel directly to request a late check-in rather than cancelling — most properties near KBLI are familiar with weather-related pilot delays and will hold rooms with advance notice. The Hampton Inn and Fairfield Inn both have 24-hour front desks.`
+              : `\nRegarding hotel accommodations: we are happy to recommend nearby properties. The Hampton Inn (3 miles, shuttle available) and Chrysalis Inn (waterfront) are both popular with our guests.`;
+          }
+
+          if (toggles.overnight || hasHangar || /tie.?down|overnight park/.test(n)) {
+            body += `\nRegarding overnight parking: ${hasHangar ? 'hangar space ($85/night) will be held pending your confirmed arrival time.' : 'tie-down space ($35/night) will be reserved for you — just confirm when you expect to arrive.'}`;
+          }
+
+          if (hasBudgetConcern) {
+            body += `\nRegarding pricing: we want to be upfront with you — aviation services reflect real operating costs including fuel, aircraft maintenance, insurance, and certified instructor time. While we always aim to provide competitive rates and will work with you to find the most cost-effective options, we are not able to offer pricing significantly below market rate. What we can do is help identify the smartest ways to minimize costs for your specific situation.`;
+          }
+          if (hasUrgency) {
+            body += `\nWe understand this is time-sensitive. Our team is treating your request as a priority — for the fastest response please call us directly at (360) 676-7211.`;
+          }
+          if (!hasIntl && !toggles.weather && !/weather|rental|hotel|lodging|cancel/.test(n) && !hasBudgetConcern && !hasUrgency) {
+            body += `\nOur team is standing by and happy to assist. For immediate help, please call us at (360) 676-7211.\n\nOffice hours: Mon–Fri 0700–1800L, Weekends 0800–1700L. After-hours on-call available.`;
+          }
+
+          body += `\n\nPlease do not hesitate to call us directly if the situation changes — we want to make sure everything is taken care of for you.`;
+          body += sig;
+          return body;
+        })()
+      }
+    };
+
+    // Complexity check — 3+ distinct topic areas detected
+    const topicAreas = [
+      { pattern: /weather|delay|can.?t leave|stuck|ifr|vfr|ceiling/i },
+      { pattern: /rental|car|vehicle|transport/i },
+      { pattern: /hotel|lodging|room|reservation/i },
+      { pattern: /fuel|jet.?a|avgas|gallon/i },
+      { pattern: /customs|cbp|international|canada|border/i },
+      { pattern: /hangar|tie.?down|overnight park/i },
+      { pattern: /train|lesson|ppl|certificate/i },
+      { pattern: /cancel|refund|won.?t make/i },
+    ];
+    const matchedTopics = topicAreas.filter(t => t.pattern.test(notes));
+    const toggleCount = [toggles.weather, toggles.rental, toggles.overnight].filter(Boolean).length;
+    const isComplex = matchedTopics.length >= 3 || (matchedTopics.length >= 2 && toggleCount >= 2);
+
+    if (isComplex) {
+      const detectedNames = [];
+      if (/weather|delay|stuck/i.test(notes)) detectedNames.push('weather delay');
+      if (/rental|car/i.test(notes)) detectedNames.push('rental car');
+      if (/hotel|lodging|room/i.test(notes)) detectedNames.push('hotel reservation');
+      if (/cancel/i.test(notes)) detectedNames.push('cancellation');
+      if (/fuel/i.test(notes)) detectedNames.push('fuel service');
+      if (/customs|international/i.test(notes)) detectedNames.push('international arrival');
+      return {
+        subject: `Customer Assistance Required — ${name}${tail ? ' | ' + tail : ''}`,
+        body: `Hello ${firstName},\n\nThank you for reaching out to Bellingham Aviation Services. We have received your message and understand you are dealing with a situation involving multiple service areas.\n\nA member of our team will personally review your request and follow up shortly. For the fastest assistance, please call us directly at (360) 676-7211 — we are here to help sort everything out.\n\n[STAFF NOTE: This draft requires manual editing. Topics detected: ${detectedNames.join(', ')}. Please address each item individually before sending.]${sig}`,
+        isComplex: true
+      };
+    }
+
+    const result = templates[type] || templates['general'];
+    // Attach isUrgent flag to any template if urgency signals detected
+    if (hasUrgency || hasMissedCall || hasAccessRequest) {
+      result.isUrgent = true;
+    }
+    return result;
+  }
+
+  function copyEmail() {
+    const subject = document.getElementById('emailSubject').textContent;
+    const body = document.getElementById('emailBody').textContent;
+    const full = `Subject: ${subject}\n\n${body}`;
+    navigator.clipboard.writeText(full).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.innerHTML = '📋 Copy Email';
+        btn.classList.remove('copied');
+      }, 2500);
     });
-  </script>
+  }
+
+  function clearAll() {
+    document.getElementById('emailOutput').style.display = 'none';
+    document.getElementById('emptyState').style.display = 'flex';
+    document.getElementById('warningBanner').style.display = 'none';
+    document.getElementById('warningList').innerHTML = '';
+    document.getElementById('warningBanner').classList.remove('error');
+    document.getElementById('customerName').value = '';
+    document.getElementById('requestType').value = '';
+    document.getElementById('tailNumber').value = '';
+    document.getElementById('arrivalTime').value = '';
+    document.getElementById('notes').value = '';
+    ['weather','rental','overnight'].forEach(k => {
+      if (toggles[k]) toggleItem(k);
+    });
+  }
+</script>
+
 </body>
 </html>
